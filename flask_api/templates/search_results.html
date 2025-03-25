@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ keyword }}" - Medium Articles{% endblock %}
+
+{% block additional_css %}
+<style>
+    .alert-info {
+        background-color: rgba(106, 13, 173, 0.1);
+        border-color: rgba(106, 13, 173, 0.2);
+        color: #6a0dad;
+    }
+    .text-muted a.text-decoration-none:hover {
+        color: #6a0dad !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <form id="search-form" action="/api/search" method="get" class="mb-4">
+                    <div class="input-group mb-3">
+                        <input type="text" id="keyword" name="keyword" class="form-control" 
+                               value="{{ keyword }}" placeholder="Enter keyword to search..." required>
+                        <input type="hidden" id="field" name="field" value="title">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="form-group me-2">
+                            <label for="limit" class="form-label">Results per page:</label>
+                            <select class="form-select form-select-sm" id="limit" name="limit">
+                                <option value="5" {% if limit == 5 %}selected{% endif %}>5</option>
+                                <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+                                <option value="20" {% if limit == 20 %}selected{% endif %}>20</option>
+                                <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <h2 class="mb-3">Search Results <small class="text-muted">({{ total }} article{% if total != 1 %}s{% endif %} found)</small></h2>
+        
+        {% if articles %}
+            {% for article in articles %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            {% if article.image_source and ',' in article.image_source %}
+                                <div class="col-md-3 mb-3 mb-md-0">
+                                    <img src="{{ article.image_source.split(',')[0] }}" alt="Article image" class="img-fluid rounded">
+                                </div>
+                                <div class="col-md-9">
+                            {% else %}
+                                <div class="col-md-12">
+                            {% endif %}
+                                <h3 class="card-title mb-2">{{ article.title }}</h3>
+                                
+                                <div class="d-flex mb-2 text-muted small">
+                                    <div class="me-3">
+                                        <i class="fas fa-user"></i> 
+                                        <a href="{{ article.author_url }}" target="_blank" class="text-decoration-none">
+                                            {{ article.author }}
+                                        </a>
+                                    </div>
+                                    <div class="me-3"><i class="far fa-clock"></i> {{ article.reading_time }}</div>
+                                    <div><i class="fas fa-hands-clapping"></i> {{ article.claps }} claps</div>
+                                </div>
+                                
+                                <div class="card-text mb-3">
+                                    {% if article.subtitle %}
+                                        <p>{{ article.subtitle[:200] }}{% if article.subtitle|length > 200 %}...{% endif %}</p>
+                                    {% endif %}
+                                </div>
+                                
+                                <a href="/article/{{ article.index }}" class="btn btn-outline-primary">Read More</a>
+                                <a href="{{ article.url }}" target="_blank" class="btn btn-outline-secondary ms-2">
+                                    <i class="fab fa-medium"></i> View on Medium
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+                <nav aria-label="Search results pagination">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous page -->
+                        {% if page > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="/api/search?keyword={{ keyword|urlencode }}&field={{ field }}&limit={{ limit }}&offset={{ (page-2)*limit }}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#"><i class="fas fa-chevron-left"></i> Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Page numbers -->
+                        {% set start_page = [1, page-2]|max %}
+                        {% set end_page = [total_pages, page+2]|min %}
+                        
+                        {% if start_page > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="/api/search?keyword={{ keyword|urlencode }}&field={{ field }}&limit={{ limit }}&offset=0">1</a>
+                            </li>
+                            {% if start_page > 2 %}
+                                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% for p in range(start_page, end_page+1) %}
+                            <li class="page-item {% if p == page %}active{% endif %}">
+                                <a class="page-link" href="/api/search?keyword={{ keyword|urlencode }}&field={{ field }}&limit={{ limit }}&offset={{ (p-1)*limit }}">
+                                    {{ p }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        
+                        {% if end_page < total_pages %}
+                            {% if end_page < total_pages - 1 %}
+                                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link" href="/api/search?keyword={{ keyword|urlencode }}&field={{ field }}&limit={{ limit }}&offset={{ (total_pages-1)*limit }}">
+                                    {{ total_pages }}
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Next page -->
+                        {% if page < total_pages %}
+                            <li class="page-item">
+                                <a class="page-link" href="/api/search?keyword={{ keyword|urlencode }}&field={{ field }}&limit={{ limit }}&offset={{ page*limit }}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Next <i class="fas fa-chevron-right"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No articles found for your search query. Please try different keywords or search fields.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    $(document).ready(function() {
+        // Handle form submission
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+            let keyword = $('#keyword').val();
+            let field = $('#field').val();
+            let limit = $('#limit').val();
+            
+            window.location.href = `/api/search?keyword=${encodeURIComponent(keyword)}&field=${field}&limit=${limit}`;
+        });
+        
+        // Update results when limit changes
+        $('#limit').on('change', function() {
+            $('#search-form').submit();
+        });
+    });
+</script>
+{% endblock %}

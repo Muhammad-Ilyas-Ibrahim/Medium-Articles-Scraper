@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Medium Articles{% endblock %}
+
+{% block additional_css %}
+<style>
+    .article-content {
+        font-family: 'Georgia', serif;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-image {
+        height: 350px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+        display: flex;
+        align-items: flex-end;
+        padding: 2rem;
+        color: white;
+    }
+    
+    .article-meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        color: #6c757d;
+    }
+    
+    .author-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    
+    .article-images {
+        margin: 2rem 0;
+    }
+    
+    .article-image {
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    blockquote {
+        padding: 0.5rem 1rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid #6a0dad;
+        font-style: italic;
+    }
+    
+    .btn-outline-secondary:hover {
+        color: #6a0dad;
+        border-color: #6a0dad;
+        background-color: rgba(106, 13, 173, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Article Header -->
+            {% if article.image_source and article.image_source.strip() %}
+                {% set first_image = article.image_source.split(',')[0] if ',' in article.image_source else article.image_source %}
+                <div class="hero-image rounded shadow" style="background-image: url('{{ first_image }}');">
+                    <div class="hero-overlay">
+                        <div>
+                            <h1 class="display-5 fw-bold">{{ article.title }}</h1>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <h1 class="display-5 fw-bold mb-4">{{ article.title }}</h1>
+            {% endif %}
+            
+            <!-- Article Meta -->
+            <div class="article-meta">
+                <img src="https://miro.medium.com/fit/c/88/88/1*{{ article.author|replace(' ', '_') }}.jpg" 
+                     alt="{{ article.author }}" class="author-avatar" 
+                     onerror="this.src='https://miro.medium.com/fit/c/88/88/1*_5_5qBDfM0JJPUpgDTQhzw.jpeg'">
+                <div>
+                    <div>
+                        <a href="{{ article.author_url }}" target="_blank" class="fw-bold text-decoration-none text-dark">
+                            {{ article.author }}
+                        </a>
+                    </div>
+                    <div class="text-muted small">
+                        <span class="me-3"><i class="far fa-clock"></i> {{ article.reading_time }}</span>
+                        <span><i class="fas fa-hands-clapping"></i> {{ article.claps }} claps</span>
+                    </div>
+                </div>
+                <div class="ms-auto">
+                    <a href="{{ article.url }}" target="_blank" class="btn btn-outline-secondary">
+                        <i class="fab fa-medium"></i> View on Medium
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Article Subtitle if available -->
+            {% if article.subtitle %}
+                <h2 class="lead fs-4 fw-normal text-muted mb-4">{{ article.subtitle }}</h2>
+            {% endif %}
+            
+            <!-- Article Content -->
+            <div class="article-content">
+                {{ article.content|safe }}
+            </div>
+            
+            <!-- Article Images -->
+            {% if article.image_source and ',' in article.image_source %}
+                <div class="article-images">
+                    <h3 class="mb-3">Article Images</h3>
+                    <div class="row">
+                        {% for image in article.image_source.split(',')[1:10] %}
+                            {% if image.strip() %}
+                                <div class="col-md-4 mb-4">
+                                    <a href="{{ image }}" target="_blank">
+                                        <img src="{{ image }}" alt="Article image" class="img-fluid rounded shadow article-image">
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Back to search -->
+            <div class="mt-5 mb-4 text-center">
+                <a href="/" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-search"></i> New Search
+                </a>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Results
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

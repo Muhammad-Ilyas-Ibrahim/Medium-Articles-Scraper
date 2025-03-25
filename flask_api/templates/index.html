@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Medium Articles Search{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-body">
+                <h1 class="text-center mb-4">Medium Articles Search</h1>
+                
+                <div class="text-center mb-4">
+                    <p class="lead">Search through 500+ Medium articles about technology, programming, design, and more.</p>
+                </div>
+                
+                <form id="search-form" action="/api/search" method="get" class="mb-4">
+                    <div class="input-group input-group-lg mb-3">
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Enter keyword to search..." required>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <div class="row g-2">
+                        <input type="hidden" id="field" name="field" value="title">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="limit" name="limit">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <label for="limit">Results per page:</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    $(document).ready(function() {
+        // Handle search form submission
+        $('#search-form').on('submit', function(e) {
+            e.preventDefault();
+            let keyword = $('#keyword').val();
+            let field = $('#field').val();
+            let limit = $('#limit').val();
+            
+            window.location.href = `/api/search?keyword=${encodeURIComponent(keyword)}&field=${field}&limit=${limit}`;
+        });
+    });
+</script>
+{% endblock %}
