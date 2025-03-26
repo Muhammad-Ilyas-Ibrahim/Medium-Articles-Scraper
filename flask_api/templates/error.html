@@ -2,33 +2,12 @@
 
 {% block title %}Error - Medium Articles Search{% endblock %}
 
-{% block additional_css %}
-<style>
-    .text-purple {
-        color: #6a0dad;
-    }
-    .btn-purple {
-        background-color: #6a0dad;
-        border-color: #6a0dad;
-        color: white;
-    }
-    .btn-outline-purple {
-        color: #6a0dad;
-        border-color: #6a0dad;
-    }
-    .btn-outline-purple:hover {
-        background-color: #6a0dad;
-        color: white;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 text-center">
         <div class="card shadow">
             <div class="card-body py-5">
-                <h1 class="display-1 text-purple">
+                <h1 class="display-1 text-danger">
                     <i class="fas fa-exclamation-triangle"></i>
                 </h1>
                 <h2 class="mb-4">Something went wrong</h2>
@@ -40,8 +19,8 @@
                 {% endif %}
                 
                 <div class="mt-4">
-                    <a href="/" class="btn btn-purple me-2">Go to Homepage</a>
-                    <a href="javascript:history.back()" class="btn btn-outline-purple">Go Back</a>
+                    <a href="/" class="btn btn-primary me-2">Go to Homepage</a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
                 </div>
             </div>
         </div>

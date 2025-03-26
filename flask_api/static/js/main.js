@@ -106,12 +106,12 @@ function setupBackToTopButton() {
         button.style.display = 'none';
         button.style.padding = '10px 15px';
         button.style.borderRadius = '50%';
-        button.style.backgroundColor = '#6a0dad';
+        button.style.backgroundColor = '#212529';
         button.style.color = '#fff';
         button.style.border = 'none';
         button.style.cursor = 'pointer';
         button.style.zIndex = '1000';
-        button.style.boxShadow = '0 2px 5px rgba(106, 13, 173, 0.3)';
+        button.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.3)';
         
         document.body.appendChild(button);
         

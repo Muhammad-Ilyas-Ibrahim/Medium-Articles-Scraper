@@ -2,19 +2,6 @@
 
 {% block title %}Search Results for "{{ keyword }}" - Medium Articles{% endblock %}
 
-{% block additional_css %}
-<style>
-    .alert-info {
-        background-color: rgba(106, 13, 173, 0.1);
-        border-color: rgba(106, 13, 173, 0.2);
-        color: #6a0dad;
-    }
-    .text-muted a.text-decoration-none:hover {
-        color: #6a0dad !important;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col-md-12">
@@ -24,7 +11,12 @@
                     <div class="input-group mb-3">
                         <input type="text" id="keyword" name="keyword" class="form-control" 
                                value="{{ keyword }}" placeholder="Enter keyword to search..." required>
-                        <input type="hidden" id="field" name="field" value="title">
+                        <select class="form-select" id="field" name="field" style="max-width: 180px;">
+                            <option value="title" {% if field == 'title' %}selected{% endif %}>Title</option>
+                            <option value="content" {% if field == 'content' %}selected{% endif %}>Content</option>
+                            <option value="author" {% if field == 'author' %}selected{% endif %}>Author</option>
+                            <option value="subtitle" {% if field == 'subtitle' %}selected{% endif %}>Subtitle</option>
+                        </select>
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search"></i> Search
                         </button>
@@ -78,7 +70,7 @@
                                     {% endif %}
                                 </div>
                                 
-                                <a href="/article/{{ article.index }}" class="btn btn-outline-primary">Read More</a>
+                                <a href="/article/{{ article.original_index }}" class="btn btn-outline-primary">Read More</a>
                                 <a href="{{ article.url }}" target="_blank" class="btn btn-outline-secondary ms-2">
                                     <i class="fab fa-medium"></i> View on Medium
                                 </a>

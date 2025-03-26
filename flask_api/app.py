@@ -50,7 +50,6 @@ def article_page(article_id):
         return render_template('error.html', message="Article not found"), 404
     
     article = df.iloc[article_id].to_dict()
-    article['index'] = article_id
     return render_template('article.html', article=article)
 
 # API health check
@@ -69,9 +68,6 @@ def search():
     search_field = request.args.get('field', 'title')  # Default search field is title
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
-    
-    # Always search in title field regardless of what's provided
-    search_field = 'title'
     
     if not keyword:
         return jsonify({
@@ -99,6 +95,8 @@ def search():
     # Search for keyword in specified column (case insensitive)
     try:
         results = df[df[search_field].str.contains(keyword, case=False, na=False)]
+        # Get the indices of matching articles
+        matching_indices = results.index.tolist()
     except Exception as e:
         return jsonify({
             "status": "error",
@@ -110,12 +108,14 @@ def search():
     
     # Apply pagination
     paginated_results = results.iloc[offset:offset+limit]
-    
-    # Add the original index of each row as a column
-    paginated_results = paginated_results.reset_index().rename(columns={'index': 'index'})
+    paginated_indices = matching_indices[offset:offset+limit]
     
     # Convert results to list of dictionaries
     articles = paginated_results.to_dict(orient='records')
+    
+    # Add the original indices to each article
+    for i, article in enumerate(articles):
+        article['original_index'] = paginated_indices[i]
     
     # If this is an AJAX request, return JSON
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -173,7 +173,6 @@ def get_article(article_id):
         }), 404
     
     article = df.iloc[article_id].to_dict()
-    article['index'] = article_id
     
     return jsonify({
         "status": "success",
